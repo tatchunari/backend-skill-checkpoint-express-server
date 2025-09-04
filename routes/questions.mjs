@@ -47,6 +47,31 @@ questionRouter.post('/',[validateCreateQuestionData], async (req, res) => {
 //   });
 // })
 
+// User can search questions by title or category
+questionRouter.get("/search", async (req, res) => {
+  let results;
+
+  const title = req.query.title || '';
+  const category = req.query.category || '';
+
+  try {
+    results = await connectionPool.query(
+     `select *
+      from questions
+      where ($1 = '' OR title ILIKE '%' || $1 || '%')
+        and ($2 = '' OR category ILIKE '%' || $2 || '%')`,
+      [title, category]
+    )
+  } catch {
+    return res.status(500).json({
+      message: "Server could not read post because database issue"
+    })
+  }
+  return res.status(200).json({
+    data: results.rows
+  })
+})
+
 // User can get a question by ID
 questionRouter.get('/:questionId', async (req, res) => {
   const questionIdFromClient = req.params.questionId;
@@ -130,34 +155,6 @@ questionRouter.delete('/:questionId', async (req, res) => {
       message: "Unable to delete question."
     })
   }
-})
-
-// User can search questions by title or category
-questionRouter.get("/", async (req, res) => {
-  let results;
-
-  const title = req.query.title || '';
-  const category = req.query.category || '';
-
-  try {
-    results = await connectionPool.query(
-     `select *
-      from questions
-      where ($1 = '' OR title ILIKE '%' || $1 || '%')
-        and ($2 = '' OR category ILIKE '%' || $2 || '%')`,
-      [title, category]
-    )
-
-    console.log('Query returned', results.rows.length, 'rows');
-    console.log('First few results:', results.rows.slice(0, 3));
-  } catch {
-    return res.status(500).json({
-      message: "Server could not read post because database issue"
-    })
-  }
-  return res.status(200).json({
-    data: results.rows
-  })
 })
 
 // User can get answers for a question
