@@ -30,19 +30,19 @@ questionRouter.post('/', async (req, res) => {
 })
 
 // User can get all questions
-questionRouter.get('/', async (req, res) => {
-  let queryRes;
-  try {
-    queryRes = await connectionPool.query('select * from questions');
-  } catch {
-    return res.status(500).json({
-      message: "Unable to fetch questions."
-    })
-  }
-  return res.status(200).json({
-    data: queryRes.rows
-  });
-})
+// questionRouter.get('/', async (req, res) => {
+//   let queryRes;
+//   try {
+//     queryRes = await connectionPool.query('select * from questions');
+//   } catch {
+//     return res.status(500).json({
+//       message: "Unable to fetch questions."
+//     })
+//   }
+//   return res.status(200).json({
+//     data: queryRes.rows
+//   });
+// })
 
 // User can get a question by ID
 questionRouter.get('/:questionId', async (req, res) => {
@@ -138,11 +138,15 @@ questionRouter.get("/", async (req, res) => {
 
   try {
     results = await connectionPool.query(
-     `select * from questions
-       where ($1 = '' OR title = $1)
-       and ($2 = '' OR category = $2)`,
+     `select *
+      from questions
+      where ($1 = '' OR title ILIKE '%' || $1 || '%')
+        and ($2 = '' OR category ILIKE '%' || $2 || '%')`,
       [title, category]
     )
+
+    console.log('Query returned', results.rows.length, 'rows');
+    console.log('First few results:', results.rows.slice(0, 3));
   } catch {
     return res.status(500).json({
       message: "Server could not read post because database issue"
