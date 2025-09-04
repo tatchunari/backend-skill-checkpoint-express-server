@@ -1,3 +1,4 @@
+391d724 - Orathai Saengsoemsap - fix: edit endpoint for search by query param
 3412125 - Orathai Saengsoemsap - feat: add middlewares for vote
 06b8105 - Orathai Saengsoemsap - feat: add Readme
 105e153 - Orathai Saengsoemsap - feat: add middlewares for validation on create answer data
