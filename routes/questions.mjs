@@ -1,10 +1,11 @@
 import { Router } from "express"
 import connectionPool from "../utils/db.mjs"
+import { validateCreateQuestionData } from "../middleswares/question.validation.mjs";
 
 const questionRouter = Router();
 
 // User can create new question
-questionRouter.post('/', async (req, res) => {
+questionRouter.post('/',[validateCreateQuestionData], async (req, res) => {
   const newQuestion = {
     ...req.body,
   }
