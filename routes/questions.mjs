@@ -2,6 +2,7 @@ import { Router } from "express"
 import connectionPool from "../utils/db.mjs"
 import { validateCreateQuestionData } from "../middleswares/question.validation.mjs";
 import { validateCreateAnswerData } from "../middleswares/answer.validation.mjs";
+import { validateVote } from "../middleswares/vote.validation.mjs";
 
 const questionRouter = Router();
 
@@ -233,7 +234,7 @@ questionRouter.delete('/:questionId/answers', async (req, res) => {
 })
 
 // User can vote on a question
-questionRouter.post('/:questionId/vote', async (req, res) => {
+questionRouter.post('/:questionId/vote', [validateVote], async (req, res) => {
   const questionIdFromClient = req.params.questionId;
 
   const newVote = req.body.vote;

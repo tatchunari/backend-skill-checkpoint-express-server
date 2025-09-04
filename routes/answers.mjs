@@ -1,11 +1,12 @@
 import { Router } from "express";
 import connectionPool from "../utils/db.mjs";
+import { validateVote } from "../middleswares/vote.validation.mjs";
 
 const answerRouter = Router();
 
 
 // User can vote on an answer
-answerRouter.post('/:answerId/vote', async (req, res) => {
+answerRouter.post('/:answerId/vote', [validateVote], async (req, res) => {
   const answerIdFromClient = req.params.answerId;
 
   const newVote = req.body.vote;
