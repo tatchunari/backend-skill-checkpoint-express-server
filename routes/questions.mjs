@@ -1,6 +1,7 @@
 import { Router } from "express"
 import connectionPool from "../utils/db.mjs"
 import { validateCreateQuestionData } from "../middleswares/question.validation.mjs";
+import { validateCreateAnswerData } from "../middleswares/answer.validation.mjs";
 
 const questionRouter = Router();
 
@@ -185,7 +186,7 @@ return res.status(200).json({
 })
 
 // User can create answer for a question
-questionRouter.post('/:questionId/answers', async (req, res) => {
+questionRouter.post('/:questionId/answers', [validateCreateAnswerData], async (req, res) => {
   const questionIdFromClient = req.params.questionId;
   const newAnswers = {
     ...req.body,
