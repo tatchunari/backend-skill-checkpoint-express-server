@@ -9,7 +9,9 @@ const questionRouter = Router();
 // User can create new question
 questionRouter.post('/',[validateCreateQuestionData], async (req, res) => {
   const newQuestion = {
-    ...req.body,
+    title: req.body.title?.trim(),
+    description: req.body.description?.trim(),
+    category: req.body.category?.trim()
   }
     try {
       await connectionPool.query(
@@ -100,7 +102,10 @@ questionRouter.get('/:questionId', async (req, res) => {
 // User can update a question by ID
 questionRouter.put('/:questionId', [validateUpdateQuestionData], async (req, res) => {
   const questionIdFromClient = req.params.questionId;
-  const updatedQuestion = {...req.body}
+  const updatedQuestion = {
+    title: req.body.title?.trim(),
+    description: req.body.description?.trim()
+  }
 
   try {
     const results = await connectionPool.query(
@@ -140,12 +145,23 @@ questionRouter.delete('/:questionId', async (req, res) => {
   const questionIdFromClient = req.params.questionId;
 
   try {
-    await connectionPool.query(
+    await
+     connectionPool.query(
+      `DELETE FROM answers WHERE question_id = $1`,
+      [questionIdFromClient]
+    );
+    const result =  await connectionPool.query(
       `
       delete from questions
       where id = $1
       `, [questionIdFromClient]
     )
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({
+          message: "Question not found."
+      });
+    }
 
     return res.status(200).json({
       message: "Question post has been deleted successfully."
