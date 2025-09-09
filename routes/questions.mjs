@@ -1,6 +1,6 @@
 import { Router } from "express"
 import connectionPool from "../utils/db.mjs"
-import { validateCreateQuestionData } from "../middleswares/question.validation.mjs";
+import { validateCreateQuestionData, validateUpdateQuestionData } from "../middleswares/question.validation.mjs";
 import { validateCreateAnswerData } from "../middleswares/answer.validation.mjs";
 import { validateVote } from "../middleswares/vote.validation.mjs";
 
@@ -33,19 +33,19 @@ questionRouter.post('/',[validateCreateQuestionData], async (req, res) => {
 })
 
 // User can get all questions
-// questionRouter.get('/', async (req, res) => {
-//   let queryRes;
-//   try {
-//     queryRes = await connectionPool.query('select * from questions');
-//   } catch {
-//     return res.status(500).json({
-//       message: "Unable to fetch questions."
-//     })
-//   }
-//   return res.status(200).json({
-//     data: queryRes.rows
-//   });
-// })
+questionRouter.get('/', async (req, res) => {
+  let queryRes;
+  try {
+    queryRes = await connectionPool.query('select * from questions');
+  } catch {
+    return res.status(500).json({
+      message: "Unable to fetch questions."
+    })
+  }
+  return res.status(200).json({
+    data: queryRes.rows
+  });
+})
 
 // User can search questions by title or category
 questionRouter.get("/search", async (req, res) => {
@@ -98,7 +98,7 @@ questionRouter.get('/:questionId', async (req, res) => {
 })
 
 // User can update a question by ID
-questionRouter.put('/:questionId', async (req, res) => {
+questionRouter.put('/:questionId', [validateUpdateQuestionData], async (req, res) => {
   const questionIdFromClient = req.params.questionId;
   const updatedQuestion = {...req.body}
 
